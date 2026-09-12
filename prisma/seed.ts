@@ -325,14 +325,17 @@ async function main() {
 
   console.log(`Creating ${replies.length} comments…`);
   for (const reply of replies) {
+    const postedAt = hoursAgo(posts[reply.postIndex].hoursAgo).getTime();
+    // A reply lands after its post, but never in the future — recent posts
+    // would otherwise get replies dated ahead of now.
+    const repliedAt = Math.min(postedAt + reply.minutesAfter * MINUTE, Date.now() - MINUTE);
+
     await prisma.comment.create({
       data: {
         body: reply.body,
         postId: postIds[reply.postIndex],
         userId: userIds.get(reply.author)!,
-        createdAt: new Date(
-          hoursAgo(posts[reply.postIndex].hoursAgo).getTime() + reply.minutesAfter * MINUTE,
-        ),
+        createdAt: new Date(repliedAt),
       },
     });
   }

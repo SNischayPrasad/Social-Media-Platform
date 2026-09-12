@@ -9,6 +9,20 @@ public; posting and interacting require an account.
 
 ---
 
+## Screenshots
+
+| The feed, signed out | Signed in, composing |
+| -------------------- | -------------------- |
+| ![The feed as an anonymous reader](docs/screenshots/01-feed-signed-out.png) | ![The feed with the composer open](docs/screenshots/03-feed-signed-in.png) |
+
+| Replies open inline | A profile |
+| ------------------- | --------- |
+| ![Two threads expanded under their posts](docs/screenshots/04-replies.png) | ![Mira's profile with counts and posts](docs/screenshots/05-profile.png) |
+
+| Sign in | Edit profile | Mobile |
+| ------- | ------------ | ------ |
+| ![The sign-in form with the demo account](docs/screenshots/02-sign-in.png) | ![The profile editor](docs/screenshots/06-edit-profile.png) | ![The feed at 390px wide](docs/screenshots/07-mobile-feed.png) |
+
 ## Contents
 
 - [Stack](#stack)
@@ -251,6 +265,18 @@ Open <http://localhost:3000> and sign in as `ada` / `commons123`.
 
 Other scripts: `npm run db:studio` opens Prisma Studio, `npm run build`
 produces a production build.
+
+### Smoke test
+
+`scripts/smoke-test.mjs` exercises every endpoint against a running server —
+auth gating, validation, idempotent likes, comment ordering, ownership checks,
+and page rendering. With the dev server up and the database freshly seeded:
+
+```bash
+npm run smoke
+```
+
+It prints one line per assertion and exits non-zero on any failure.
 
 ## Deploying to Vercel
 

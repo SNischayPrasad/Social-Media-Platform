@@ -95,7 +95,7 @@ export function PostCard({
     }
   }
 
-  async function addComment(event: React.FormEvent) {
+  async function addComment(event: React.SyntheticEvent) {
     event.preventDefault();
     if (!viewer) return router.push("/login");
     if (!draft.trim()) return;
@@ -264,6 +264,9 @@ export function PostCard({
                 <input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) addComment(e);
+                  }}
                   maxLength={300}
                   placeholder="Write a reply"
                   aria-label="Write a reply"

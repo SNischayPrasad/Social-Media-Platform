@@ -280,28 +280,28 @@ It prints one line per assertion and exits non-zero on any failure.
 
 ## Deploying to Vercel
 
-The project is already linked to this repository, so every push to `main`
-redeploys automatically. To stand up a fresh copy:
+The project is linked to this repository, so every push to `main` redeploys
+automatically. To stand up a fresh copy:
 
 1. Import the repo at [vercel.com/new](https://vercel.com/new).
-2. Add a Postgres database — **Storage → Create → Neon** in the Vercel
-   dashboard sets `DATABASE_URL` for you. Any Postgres URL works.
+2. Add a Postgres database — **Storage → Create Database → Neon** sets
+   `DATABASE_URL` for you. Set the variable prefix to `DATABASE` so the
+   integration writes `DATABASE_URL` rather than `STORAGE_URL`. Any Postgres
+   provider works.
 3. Add `JWT_SECRET` under **Settings → Environment Variables** (all
    environments). Generate one with `openssl rand -base64 32`.
-4. Redeploy so the new variables are picked up. `npm run build` runs
-   `prisma generate` first, so the client matches the schema.
-5. Create the tables and load the sample data against the production database,
-   once, from your machine:
+4. Deploy.
 
-   ```bash
-   vercel link
-   vercel env pull .env
-   npm run db:push
-   npm run db:seed
-   ```
+There is no manual migration step. The build runs
+[`prisma/provision.mjs`](prisma/provision.mjs), which pushes the schema and —
+only when the users table is empty — loads the sample dataset. Redeploys leave
+visitor-written posts alone, and a build without `DATABASE_URL` skips
+provisioning instead of failing. When the host offers a direct
+`DATABASE_URL_UNPOOLED` alongside the pooled URL (Neon does), provisioning uses
+it, since DDL and bulk writes need a connection that doesn't go through the
+pooler.
 
-Both variables are required at runtime: without `DATABASE_URL` every page that
-reads the feed returns a 500, and without `JWT_SECRET` sign-in fails.
+`JWT_SECRET` is required at runtime — sign-in fails without it.
 
 ## Sample dataset
 
@@ -314,7 +314,8 @@ reads the feed returns a 500, and without `JWT_SECRET` sign-in fails.
 - **27 follow** relationships
 
 Every account uses the password `commons123`. The seed clears the tables it
-owns first, so it is safe to re-run.
+owns first, so it is safe to re-run. On a deploy host it runs automatically on
+the first build only — see [Deploying to Vercel](#deploying-to-vercel).
 
 ## Project layout
 
@@ -322,6 +323,7 @@ owns first, so it is safe to re-run.
 prisma/
   schema.prisma        Five models: User, Post, Like, Comment, Follow
   seed.ts              Sample dataset
+  provision.mjs        Build-time schema push + first-run seed
 src/
   app/
     page.tsx           The feed

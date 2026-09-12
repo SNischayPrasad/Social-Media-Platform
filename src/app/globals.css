@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Commons — design tokens
+   A dark aubergine ground with bone type and a single persimmon accent.
+   The accent is spent on one thing: the act of responding (like, reply, post).
+   --------------------------------------------------------------------------- */
+
+@theme {
+  --color-ink: #15111c;
+  --color-ink-raised: #1d1727;
+  --color-ink-high: #272034;
+  --color-hairline: #362c47;
+
+  --color-bone: #f3edf7;
+  --color-muted: #a496b8;
+  --color-faint: #6f6382;
+
+  --color-persimmon: #ff5c4d;
+  --color-persimmon-dim: #b83a30;
+  --color-lilac: #b9a4e0;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --radius-card: 14px;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+/* A faint grain lifts the flat dark ground off the screen. Purely atmospheric,
+   so it sits behind everything and never intercepts pointer events. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* The ambient wash behind the top of the page — the one bit of colour that
+   isn't attached to an action. */
+body::after {
+  content: "";
+  position: fixed;
+  top: -280px;
+  left: 50%;
+  width: 900px;
+  height: 560px;
+  margin-left: -450px;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 92, 77, 0.16),
+    rgba(185, 164, 224, 0.08) 45%,
+    transparent 70%
+  );
+  filter: blur(40px);
+}
+
+::selection {
+  background: var(--color-persimmon);
+  color: #15111c;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-persimmon);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Custom scrollbar, tuned to the ground colour. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-hairline) transparent;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.32); }
+  100% { transform: scale(1); }
+}
+
+.animate-rise {
+  animation: rise 0.45s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.animate-pop {
+  animation: pop 0.32s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

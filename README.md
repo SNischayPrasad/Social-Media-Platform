@@ -4,7 +4,7 @@ A full-stack social platform: user profiles, posts with optional media, a single
 reverse-chronological feed, likes, threaded replies, and follows. Reading is
 public; posting and interacting require an account.
 
-**Live demo:** _(added after deploy)_
+**Live demo:** <https://social-media-platform-green-ve.vercel.app>
 **Demo account:** `ada` / `commons123` — every seeded user shares that password.
 
 ---
@@ -280,20 +280,28 @@ It prints one line per assertion and exits non-zero on any failure.
 
 ## Deploying to Vercel
 
-1. Push the repo to GitHub.
-2. Import it at [vercel.com/new](https://vercel.com/new).
-3. Add a Postgres database — **Storage → Create → Neon** in the Vercel
-   dashboard wires `DATABASE_URL` in automatically. Any Postgres URL works.
-4. Add `JWT_SECRET` under **Settings → Environment Variables**.
-5. Deploy. `npm run build` runs `prisma generate` first, so the client is built
-   against the deployed schema.
-6. Push the schema and seed the production database once, from your machine,
-   with the production `DATABASE_URL` in `.env`:
+The project is already linked to this repository, so every push to `main`
+redeploys automatically. To stand up a fresh copy:
+
+1. Import the repo at [vercel.com/new](https://vercel.com/new).
+2. Add a Postgres database — **Storage → Create → Neon** in the Vercel
+   dashboard sets `DATABASE_URL` for you. Any Postgres URL works.
+3. Add `JWT_SECRET` under **Settings → Environment Variables** (all
+   environments). Generate one with `openssl rand -base64 32`.
+4. Redeploy so the new variables are picked up. `npm run build` runs
+   `prisma generate` first, so the client matches the schema.
+5. Create the tables and load the sample data against the production database,
+   once, from your machine:
 
    ```bash
+   vercel link
+   vercel env pull .env
    npm run db:push
    npm run db:seed
    ```
+
+Both variables are required at runtime: without `DATABASE_URL` every page that
+reads the feed returns a 500, and without `JWT_SECRET` sign-in fails.
 
 ## Sample dataset
 
